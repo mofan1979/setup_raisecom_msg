@@ -82,8 +82,10 @@ class Msg:
                     self.tn.write('erase startup-config\n'.encode())
                     self.tn.read_until(b"#", timeout=15)
                     self.tn.write('reboot\n'.encode())
-                    self.tn.read_until(b"confirm:", timeout=1)
+                    # self.tn.read_until(b"confirm:", timeout=1)
+                    sleep(1)
                     self.tn.write(b'y\n')
+                    self.tn.read_until(b'#', timeout=5)
                     logging.info('%s 批次号已修改为 %s ，设备自动重启，如果设备没有自动重启，请手动重启设备生效', self.ip, self.bn)
                 self.logout()
             except:
