@@ -94,7 +94,7 @@ class Msg:
 
 
 if __name__ == '__main__':
-    input('请确认WEB设置页面-基础配置-接口配置-LAN接口配置中，管理访问：TELNET已经打勾并应用。按回车继续')
+    input('请确认电脑连接到设备的LAN 1口，能PING通地址192.168.1.1。按回车继续')
     msg2100 = Msg(bn='GX01', ip='192.168.1.1', telnetuser='telecomadmin', telnetpw='nE7jA%5m')
     msg2100.mod_bn()
     input('按回车退出')
