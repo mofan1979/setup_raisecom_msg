@@ -3,6 +3,7 @@ import logging
 from telnetlib import Telnet  # 调用telnet方法需要的库
 from datetime import datetime
 import socket
+from time import sleep
 
 # 日志模块初始化
 logger = logging.getLogger()  # 定义对应的程序模块名name，默认是root
@@ -19,9 +20,9 @@ logger.addHandler(ch)
 
 
 class Msg:
-    def __init__(self, ip, telnetuser, telnetpw):
+    def __init__(self, bn, ip, telnetuser, telnetpw):
         self.login_flag = False
-        self.bn = ''
+        self.bn = bn
         self.ip = ip
         self.telnetuser = telnetuser
         self.telnetpw = telnetpw
@@ -67,24 +68,23 @@ class Msg:
                 # 读取版本
                 self.tn.write('show version\n'.encode())
                 msginfo = self.tn.read_until(b"#", timeout=2).decode("utf8", "ignore")
-                if 'GX01' in msginfo:
-                    self.bn = 'GX01'
+                if self.bn in msginfo:
                     logging.info('%s 批次号为 %s , 不需要修改', self.ip, self.bn)
                 else:
                     self.tn.write('testnode\n'.encode())
                     self.tn.read_until(b"Password:", timeout=2)
                     self.tn.write('rcios.test\n'.encode())
                     self.tn.read_until(b"(test-node)#", timeout=2)
-                    self.tn.write('bn GX01\n'.encode())
+                    self.tn.write(('bn %s\n' % self.bn).encode())
                     self.tn.read_until(b"(test-node)#", timeout=2)
                     self.tn.write('end\n'.encode())
                     self.tn.read_until(b"#", timeout=2)
                     self.tn.write('erase startup-config\n'.encode())
-                    self.tn.read_until(b"#", timeout=10)
+                    self.tn.read_until(b"#", timeout=15)
                     self.tn.write('reboot\n'.encode())
-                    self.tn.read_until(b'Please enter "y/n"  to confirm:', timeout=2)
-                    self.tn.write('y\n'.encode())
-                    logging.info('%s 批次号已修改为GX01，广西版本，设备正在重启', self.ip)
+                    self.tn.read_until(b"confirm:", timeout=1)
+                    self.tn.write(b'y\n')
+                    logging.info('%s 批次号已修改为 %s ，设备自动重启，如果设备没有自动重启，请手动重启设备生效', self.ip, self.bn)
                 self.logout()
             except:
                 logging.warning('%s 修改批次号错误', self.ip)
@@ -92,6 +92,7 @@ class Msg:
 
 
 if __name__ == '__main__':
-    msg2100 = Msg(ip='192.168.1.1', telnetuser='telecomadmin', telnetpw='nE7jA%5m')
+    input('请确认WEB设置页面-基础配置-接口配置-LAN接口配置中，管理访问：TELNET已经打勾并应用。按回车继续')
+    msg2100 = Msg(bn='GX01', ip='192.168.1.1', telnetuser='telecomadmin', telnetpw='nE7jA%5m')
     msg2100.mod_bn()
     input('按回车退出')
