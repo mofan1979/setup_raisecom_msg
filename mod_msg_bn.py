@@ -49,8 +49,8 @@ class Msg:
             logging.warning('%s login 失败，设备不在线' % self.ip)
             return '%s,login 失败，设备不在线\n' % self.ip
         except EOFError:
-            logging.warning('%s 连接断开，可能会话数已满' % (self.ip))
-            return '%s,连接断开，可能会话数已满\n' % (self.ip)
+            logging.warning('%s 连接断开，可能会话数已满' % self.ip)
+            return '%s,连接断开，可能会话数已满\n' % self.ip
 
     def logout(self):
         try:
@@ -72,17 +72,17 @@ class Msg:
                     logging.info('%s 批次号为 %s , 不需要修改', self.ip, self.bn)
                 else:
                     self.tn.write('testnode\n'.encode())
-                    l = self.tn.read_until(b"Password:", timeout=2).decode("utf8", "ignore")
+                    self.tn.read_until(b"Password:", timeout=2)
                     self.tn.write('rcios.test\n'.encode())
-                    l = self.tn.read_until(b"(test-node)#", timeout=2).decode("utf8", "ignore")
+                    self.tn.read_until(b"(test-node)#", timeout=2)
                     self.tn.write('bn GX01\n'.encode())
-                    l = self.tn.read_until(b"(test-node)#", timeout=2).decode("utf8", "ignore")
+                    self.tn.read_until(b"(test-node)#", timeout=2)
                     self.tn.write('end\n'.encode())
-                    l = self.tn.read_until(b"#", timeout=2).decode("utf8", "ignore")
+                    self.tn.read_until(b"#", timeout=2)
                     self.tn.write('erase startup-config\n'.encode())
-                    l = self.tn.read_until(b"#", timeout=10).decode("utf8", "ignore")
+                    self.tn.read_until(b"#", timeout=10)
                     self.tn.write('reboot\n'.encode())
-                    l = self.tn.read_until(b'Please enter "y/n"  to confirm:', timeout=2).decode("utf8", "ignore")
+                    self.tn.read_until(b'Please enter "y/n"  to confirm:', timeout=2)
                     self.tn.write('y\n'.encode())
                     logging.info('%s 批次号已修改为GX01，广西版本，设备正在重启', self.ip)
                 self.logout()
